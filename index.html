@@ -100,8 +100,8 @@ body {
 /* WINDOWS */
 .window {
   position: absolute;
-  width: 700px;
-  height: 500px;
+  width: 900px;
+  height: 600px;
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 6px;
@@ -112,7 +112,7 @@ body {
 }
 
 .window.expanded {
-  width: 1200px;
+  width: 1400px;
 }
 
 .window-header {
@@ -199,6 +199,53 @@ body {
   border: none;
 }
 
+/* CODE EDITOR LAYOUT */
+.code-editor-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.code-left {
+  width: 40%;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-left textarea {
+  flex: 1;
+  background: #000;
+  color: #0f0;
+  border: none;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 14px;
+  resize: none;
+}
+
+.code-right {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-preview {
+  flex: 1;
+  border: none;
+}
+
+.code-ai {
+  height: 40%;
+  border-top: 1px solid #333;
+}
+
+.code-ai iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 /* RESIZE HANDLE */
 .resize-handle {
   width: 16px;
@@ -231,10 +278,10 @@ body {
     <span>EaglerCraft</span>
   </div>
 
-  <!-- Scratch Icon -->
-  <div class="desktop-icon" id="icon-scratch" style="top:20px; left:220px;">
-    <img src="https://seeklogo.com/images/S/scratch-logo-B13B10E544-seeklogo.com.png">
-    <span>Scratch</span>
+  <!-- Code Studio Icon -->
+  <div class="desktop-icon" id="icon-code" style="top:20px; left:220px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
+    <span>Code Studio</span>
   </div>
 </div>
 
@@ -255,9 +302,9 @@ body {
     <span>EaglerCraft</span>
   </div>
 
-  <div class="start-item" id="start-scratch">
-    <img src="https://seeklogo.com/images/S/scratch-logo-B13B10E544-seeklogo.com.png">
-    <span>Scratch Editor</span>
+  <div class="start-item" id="start-code">
+    <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
+    <span>Code Studio</span>
   </div>
 </div>
 
@@ -277,8 +324,8 @@ document.getElementById("start-narnia").onclick = openNarnia;
 document.getElementById("icon-eagler").onclick = openEagler;
 document.getElementById("start-eagler").onclick = openEagler;
 
-document.getElementById("icon-scratch").onclick = openScratch;
-document.getElementById("start-scratch").onclick = openScratch;
+document.getElementById("icon-code").onclick = openCodeStudio;
+document.getElementById("start-code").onclick = openCodeStudio;
 
 /* CREATE WINDOW */
 function createWindow(title, icon, content) {
@@ -406,19 +453,56 @@ function openEagler() {
   );
 }
 
-/* SCRATCH EDITOR APP */
-function openScratch() {
+/* CODE STUDIO APP */
+function openCodeStudio() {
   const content = `
     <div class="window-content">
-      <iframe style="width:100%; height:100%; border:none;" src="https://scratch.mit.edu/projects/editor/?tutorial=getStarted"></iframe>
+      <div class="code-editor-container">
+
+        <div class="code-left">
+          <textarea id="code-editor">
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { background: black; color: lime; font-family: monospace; }
+</style>
+</head>
+<body>
+<h1>Hello LeonOS</h1>
+<p>This is your live preview.</p>
+</body>
+</html>
+          </textarea>
+        </div>
+
+        <div class="code-right">
+          <iframe class="code-preview" id="code-preview"></iframe>
+
+          <div class="code-ai">
+            <iframe src="https://chat.deepseek.com/"></iframe>
+          </div>
+        </div>
+
+      </div>
     </div>
   `;
 
-  createWindow(
-    "Scratch Editor",
-    "https://seeklogo.com/images/S/scratch-logo-B13B10E544-seeklogo.com.png",
+  const win = createWindow(
+    "Code Studio",
+    "https://cdn-icons-png.flaticon.com/512/906/906324.png",
     content
   );
+
+  const editor = win.querySelector("#code-editor");
+  const preview = win.querySelector("#code-preview");
+
+  function updatePreview() {
+    preview.srcdoc = editor.value;
+  }
+
+  editor.addEventListener("input", updatePreview);
+  updatePreview();
 }
 </script>
 
