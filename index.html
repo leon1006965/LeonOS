@@ -288,6 +288,7 @@ body {
 <!-- TASKBAR -->
 <div id="taskbar">
   <button id="start-btn">Start</button>
+  <div id="clock" style="margin-left:auto; color:white; font-size:14px; padding-right:10px;"></div>
 </div>
 
 <!-- START MENU -->
@@ -504,8 +505,19 @@ body { background: black; color: lime; font-family: monospace; }
   editor.addEventListener("input", updatePreview);
   updatePreview();
 }
+
+/* CLOCK */
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2, "0");
+  const m = now.getMinutes().toString().padStart(2, "0");
+  document.getElementById("clock").textContent = `${h}:${m}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
 </script>
 
 </body>
 </html>
+
 
