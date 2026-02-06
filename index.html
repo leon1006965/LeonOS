@@ -108,6 +108,11 @@ body {
   border: 1px solid #333;
   border-radius: 6px;
   overflow: hidden;
+  transition: width 0.25s ease;
+}
+
+.window.expanded {
+  width: 1200px;
 }
 
 .window-header {
@@ -142,6 +147,7 @@ body {
   width: 100%;
   height: calc(100% - 40px);
   background: #000;
+  position: relative;
 }
 
 /* BROWSER */
@@ -174,18 +180,18 @@ body {
   border: none;
 }
 
-/* COPILOT SIDEBAR */
-#copilot-sidebar {
+/* GROK SIDEBAR */
+#grok-sidebar {
   position: absolute;
   left: 0;
   top: 40px;
-  width: 300px;
+  width: 450px;
   height: calc(100% - 40px);
   background: #111;
   border-right: 1px solid #333;
 }
 
-#copilot-sidebar iframe {
+#grok-sidebar iframe {
   width: 100%;
   height: 100%;
   border: none;
@@ -274,17 +280,17 @@ function createWindow(title, icon, content) {
   return win;
 }
 
-/* NARNIA BROWSER */
+/* NARNIA BROWSER WITH GROK */
 function openNarnia() {
   const content = `
     <div class="browser-toolbar">
       <input id="narnia-url" placeholder="Search or enter URL">
       <button id="narnia-go">Go</button>
-      <button id="narnia-copilot">Copilot</button>
+      <button id="narnia-ai">AI</button>
     </div>
 
-    <div id="copilot-sidebar" class="hidden">
-      <iframe src="https://copilot.microsoft.com"></iframe>
+    <div id="grok-sidebar" class="hidden">
+      <iframe src="https://grok.com"></iframe>
     </div>
 
     <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
@@ -295,8 +301,10 @@ function openNarnia() {
   const urlInput = win.querySelector("#narnia-url");
   const goBtn = win.querySelector("#narnia-go");
   const frame = win.querySelector("#browser-frame");
-  const copilotBtn = win.querySelector("#narnia-copilot");
-  const sidebar = win.querySelector("#copilot-sidebar");
+  const aiBtn = win.querySelector("#narnia-ai");
+  const sidebar = win.querySelector("#grok-sidebar");
+
+  let aiOpen = false;
 
   function loadURL() {
     let url = urlInput.value.trim();
@@ -308,7 +316,11 @@ function openNarnia() {
   goBtn.onclick = loadURL;
   urlInput.onkeydown = (e) => { if (e.key === "Enter") loadURL(); };
 
-  copilotBtn.onclick = () => sidebar.classList.toggle("hidden");
+  aiBtn.onclick = () => {
+    aiOpen = !aiOpen;
+    sidebar.classList.toggle("hidden");
+    win.classList.toggle("expanded");
+  };
 }
 </script>
 
