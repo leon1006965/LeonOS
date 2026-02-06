@@ -35,8 +35,6 @@ body {
   cursor: pointer;
   margin: 20px;
   position: absolute;
-  top: 20px;
-  left: 20px;
 }
 
 .desktop-icon img {
@@ -221,10 +219,16 @@ body {
 <div id="desktop">
   <img id="wallpaper" src="https://wallpapers-clan.com/wp-content/uploads/2024/03/starfall-night-sky-mountains-aesthetic-gif-cover-desktop-wallpaper.gif">
 
-  <!-- Narnia Desktop Icon -->
-  <div class="desktop-icon" id="icon-narnia">
+  <!-- Narnia Icon -->
+  <div class="desktop-icon" id="icon-narnia" style="top:20px; left:20px;">
     <img src="https://logodix.com/logo/53558.png">
     <span>Narnia</span>
+  </div>
+
+  <!-- EaglerCraft Icon -->
+  <div class="desktop-icon" id="icon-eagler" style="top:20px; left:120px;">
+    <img src="https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c">
+    <span>EaglerCraft</span>
   </div>
 </div>
 
@@ -239,6 +243,11 @@ body {
     <img src="https://logodix.com/logo/53558.png">
     <span>Narnia Browser</span>
   </div>
+
+  <div class="start-item" id="start-eagler">
+    <img src="https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c">
+    <span>EaglerCraft</span>
+  </div>
 </div>
 
 <!-- WINDOW AREA -->
@@ -250,9 +259,12 @@ document.getElementById("start-btn").onclick = () => {
   document.getElementById("start-menu").classList.toggle("hidden");
 };
 
-/* ICON + START MENU → OPEN NARNIA */
+/* ICON + START MENU → OPEN APPS */
 document.getElementById("icon-narnia").onclick = openNarnia;
 document.getElementById("start-narnia").onclick = openNarnia;
+
+document.getElementById("icon-eagler").onclick = openEagler;
+document.getElementById("start-eagler").onclick = openEagler;
 
 /* CREATE WINDOW */
 function createWindow(title, icon, content) {
@@ -347,8 +359,6 @@ function openNarnia() {
   const aiBtn = win.querySelector("#narnia-ai");
   const aiPanel = win.querySelector("#ai-panel");
 
-  let aiOpen = false;
-
   function loadURL() {
     let url = urlInput.value.trim();
     if (!url) return;
@@ -362,13 +372,26 @@ function openNarnia() {
   urlInput.onkeydown = (e) => { if (e.key === "Enter") loadURL(); };
 
   aiBtn.onclick = () => {
-    aiOpen = !aiOpen;
     aiPanel.classList.toggle("hidden");
     win.classList.toggle("expanded");
   };
+}
+
+/* EAGLERCRAFT APP */
+function openEagler() {
+  const content = `
+    <div class="window-content">
+      <iframe style="width:100%; height:100%; border:none;" src="https://eaglercraft.com/"></iframe>
+    </div>
+  `;
+
+  createWindow(
+    "EaglerCraft",
+    "https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c",
+    content
+  );
 }
 </script>
 
 </body>
 </html>
-
