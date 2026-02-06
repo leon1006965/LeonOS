@@ -178,25 +178,25 @@ body {
 }
 
 /* SPLIT VIEW */
-#ai-panel {
+.ai-panel {
   width: 450px;
   background: #111;
   border-right: 1px solid #333;
 }
 
-#ai-panel iframe {
+.ai-panel iframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-#browser-area {
+.browser-area {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-#browser-frame {
+.browser-frame {
   flex: 1;
   border: none;
 }
@@ -285,14 +285,14 @@ function createWindow(title, icon, content) {
     offsetY = e.clientY - win.offsetTop;
   };
 
-  document.onmousemove = (e) => {
+  document.addEventListener("mousemove", (e) => {
     if (drag) {
       win.style.left = (e.clientX - offsetX) + "px";
       win.style.top = (e.clientY - offsetY) + "px";
     }
-  };
+  });
 
-  document.onmouseup = () => drag = false;
+  document.addEventListener("mouseup", () => drag = false);
 
   /* RESIZING */
   const handle = win.querySelector(".resize-handle");
@@ -307,19 +307,19 @@ function createWindow(title, icon, content) {
     e.preventDefault();
   };
 
-  document.onmousemove = (e) => {
+  document.addEventListener("mousemove", (e) => {
     if (resizing) {
-      win.style.width = startW + (e.clientX - startX) + "px";
-      win.style.height = startH + (e.clientY - startY) + "px";
+      win.style.width = Math.max(500, startW + (e.clientX - startX)) + "px";
+      win.style.height = Math.max(300, startH + (e.clientY - startY)) + "px";
     }
-  };
+  });
 
-  document.onmouseup = () => resizing = false;
+  document.addEventListener("mouseup", () => resizing = false);
 
   return win;
 }
 
-/* NARNIA BROWSER WITH DUCK.AI */
+/* NARNIA BROWSER WITH DEEPSEEK */
 function openNarnia() {
   const content = `
     <div class="browser-toolbar">
@@ -329,12 +329,12 @@ function openNarnia() {
     </div>
 
     <div class="window-content">
-      <div id="ai-panel" class="hidden">
-        <iframe src="https://duck.ai"></iframe>
+      <div class="ai-panel hidden" id="ai-panel">
+        <iframe src="https://chat.deepseek.com/"></iframe>
       </div>
 
-      <div id="browser-area">
-        <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
+      <div class="browser-area">
+        <iframe class="browser-frame" id="browser-frame" src="https://duckduckgo.com"></iframe>
       </div>
     </div>
   `;
@@ -351,8 +351,10 @@ function openNarnia() {
 
   function loadURL() {
     let url = urlInput.value.trim();
-    if (!url.startsWith("http"))
+    if (!url) return;
+    if (!url.startsWith("http")) {
       url = "https://duckduckgo.com/?q=" + encodeURIComponent(url);
+    }
     frame.src = url;
   }
 
@@ -369,3 +371,4 @@ function openNarnia() {
 
 </body>
 </html>
+
