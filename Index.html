@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LeonOS</title>
+
+<style>
+/* GENERAL */
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+/* DESKTOP */
+#desktop {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+#wallpaper {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  z-index: -1;
+}
+
+/* DESKTOP ICONS */
+.desktop-icon {
+  width: 80px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  margin: 20px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.desktop-icon img {
+  width: 60px;
+  height: 60px;
+}
+
+/* TASKBAR */
+#taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: rgba(20,20,20,0.8);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+#taskbar button {
+  background: #2d2d2d;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* START MENU */
+#start-menu {
+  position: fixed;
+  bottom: 40px;
+  left: 10px;
+  width: 200px;
+  background: rgba(30,30,30,0.95);
+  border: 1px solid #444;
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.start-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.start-item:hover {
+  background: #444;
+}
+
+.start-item img {
+  width: 24px;
+  height: 24px;
+}
+
+/* WINDOWS */
+.window {
+  position: absolute;
+  width: 700px;
+  height: 500px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.window-header {
+  background: #222;
+  padding: 6px;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.window-header img {
+  width: 20px;
+  height: 20px;
+}
+
+.window-header span {
+  flex: 1;
+  color: white;
+}
+
+.window-header button {
+  background: red;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.window-content {
+  width: 100%;
+  height: calc(100% - 40px);
+  background: #000;
+}
+
+/* BROWSER */
+.browser-toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: #111;
+}
+
+.browser-toolbar input {
+  flex: 1;
+  padding: 6px;
+  background: #222;
+  border: 1px solid #444;
+  color: white;
+}
+
+.browser-toolbar button {
+  padding: 6px 10px;
+  background: #2d7dff;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#browser-frame {
+  width: 100%;
+  height: calc(100% - 40px);
+  border: none;
+}
+
+/* COPILOT SIDEBAR */
+#copilot-sidebar {
+  position: absolute;
+  left: 0;
+  top: 40px;
+  width: 300px;
+  height: calc(100% - 40px);
+  background: #111;
+  border-right: 1px solid #333;
+}
+
+#copilot-sidebar iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <img id="wallpaper" src="https://wallpapers-clan.com/wp-content/uploads/2024/03/starfall-night-sky-mountains-aesthetic-gif-cover-desktop-wallpaper.gif">
+
+  <!-- Narnia Desktop Icon -->
+  <div class="desktop-icon" id="icon-narnia">
+    <img src="https://logodix.com/logo/53558.png">
+    <span>Narnia</span>
+  </div>
+</div>
+
+<!-- TASKBAR -->
+<div id="taskbar">
+  <button id="start-btn">Start</button>
+</div>
+
+<!-- START MENU -->
+<div id="start-menu" class="hidden">
+  <div class="start-item" id="start-narnia">
+    <img src="https://logodix.com/logo/53558.png">
+    <span>Narnia Browser</span>
+  </div>
+</div>
+
+<!-- WINDOW AREA -->
+<div id="window-area"></div>
+
+<script>
+/* START MENU TOGGLE */
+document.getElementById("start-btn").onclick = () => {
+  document.getElementById("start-menu").classList.toggle("hidden");
+};
+
+/* ICON + START MENU → OPEN NARNIA */
+document.getElementById("icon-narnia").onclick = openNarnia;
+document.getElementById("start-narnia").onclick = openNarnia;
+
+/* CREATE WINDOW */
+function createWindow(title, icon, content) {
+  const win = document.createElement("div");
+  win.className = "window";
+  win.style.left = "120px";
+  win.style.top = "120px";
+
+  win.innerHTML = `
+    <div class="window-header">
+      <img src="${icon}">
+      <span>${title}</span>
+      <button class="close-btn"></button>
+    </div>
+    <div class="window-content">${content}</div>
+  `;
+
+  document.getElementById("window-area").appendChild(win);
+
+  /* CLOSE BUTTON */
+  win.querySelector(".close-btn").onclick = () => win.remove();
+
+  /* DRAGGING */
+  let drag = false, offsetX, offsetY;
+
+  win.querySelector(".window-header").onmousedown = (e) => {
+    drag = true;
+    offsetX = e.clientX - win.offsetLeft;
+    offsetY = e.clientY - win.offsetTop;
+  };
+
+  document.onmousemove = (e) => {
+    if (drag) {
+      win.style.left = (e.clientX - offsetX) + "px";
+      win.style.top = (e.clientY - offsetY) + "px";
+    }
+  };
+
+  document.onmouseup = () => drag = false;
+
+  return win;
+}
+
+/* NARNIA BROWSER */
+function openNarnia() {
+  const content = `
+    <div class="browser-toolbar">
+      <input id="narnia-url" placeholder="Search or enter URL">
+      <button id="narnia-go">Go</button>
+      <button id="narnia-copilot">Copilot</button>
+    </div>
+
+    <div id="copilot-sidebar" class="hidden">
+      <iframe src="https://copilot.microsoft.com"></iframe>
+    </div>
+
+    <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
+  `;
+
+  const win = createWindow("Narnia Browser", "https://logodix.com/logo/53558.png", content);
+
+  const urlInput = win.querySelector("#narnia-url");
+  const goBtn = win.querySelector("#narnia-go");
+  const frame = win.querySelector("#browser-frame");
+  const copilotBtn = win.querySelector("#narnia-copilot");
+  const sidebar = win.querySelector("#copilot-sidebar");
+
+  function loadURL() {
+    let url = urlInput.value.trim();
+    if (!url.startsWith("http"))
+      url = "https://duckduckgo.com/?q=" + encodeURIComponent(url);
+    frame.src = url;
+  }
+
+  goBtn.onclick = loadURL;
+  urlInput.onkeydown = (e) => { if (e.key === "Enter") loadURL(); };
+
+  copilotBtn.onclick = () => sidebar.classList.toggle("hidden");
+}
+</script>
+
+</body>
+</html>
