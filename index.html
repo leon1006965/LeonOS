@@ -108,6 +108,8 @@ body {
   border: 1px solid #333;
   border-radius: 6px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   transition: width 0.25s ease;
 }
 
@@ -143,14 +145,15 @@ body {
   cursor: pointer;
 }
 
+/* CONTENT AREA */
 .window-content {
-  width: 100%;
-  height: calc(100% - 40px);
+  flex: 1;
+  display: flex;
   background: #000;
   position: relative;
 }
 
-/* BROWSER */
+/* BROWSER TOOLBAR */
 .browser-toolbar {
   display: flex;
   gap: 6px;
@@ -174,27 +177,40 @@ body {
   cursor: pointer;
 }
 
-#browser-frame {
-  width: 100%;
-  height: calc(100% - 40px);
-  border: none;
-}
-
-/* GROK SIDEBAR */
-#grok-sidebar {
-  position: absolute;
-  left: 0;
-  top: 40px;
+/* SPLIT VIEW */
+#ai-panel {
   width: 450px;
-  height: calc(100% - 40px);
   background: #111;
   border-right: 1px solid #333;
 }
 
-#grok-sidebar iframe {
+#ai-panel iframe {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+#browser-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#browser-frame {
+  flex: 1;
+  border: none;
+}
+
+/* RESIZE HANDLE */
+.resize-handle {
+  width: 16px;
+  height: 16px;
+  background: #444;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: se-resize;
+  border-top-left-radius: 4px;
 }
 </style>
 </head>
@@ -251,7 +267,8 @@ function createWindow(title, icon, content) {
       <span>${title}</span>
       <button class="close-btn"></button>
     </div>
-    <div class="window-content">${content}</div>
+    ${content}
+    <div class="resize-handle"></div>
   `;
 
   document.getElementById("window-area").appendChild(win);
@@ -277,10 +294,32 @@ function createWindow(title, icon, content) {
 
   document.onmouseup = () => drag = false;
 
+  /* RESIZING */
+  const handle = win.querySelector(".resize-handle");
+  let resizing = false, startX, startY, startW, startH;
+
+  handle.onmousedown = (e) => {
+    resizing = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startW = win.offsetWidth;
+    startH = win.offsetHeight;
+    e.preventDefault();
+  };
+
+  document.onmousemove = (e) => {
+    if (resizing) {
+      win.style.width = startW + (e.clientX - startX) + "px";
+      win.style.height = startH + (e.clientY - startY) + "px";
+    }
+  };
+
+  document.onmouseup = () => resizing = false;
+
   return win;
 }
 
-/* NARNIA BROWSER WITH GROK */
+/* NARNIA BROWSER WITH DUCK.AI */
 function openNarnia() {
   const content = `
     <div class="browser-toolbar">
@@ -289,11 +328,15 @@ function openNarnia() {
       <button id="narnia-ai">AI</button>
     </div>
 
-    <div id="grok-sidebar" class="hidden">
-      <iframe src="https://grok.com"></iframe>
-    </div>
+    <div class="window-content">
+      <div id="ai-panel" class="hidden">
+        <iframe src="https://duck.ai"></iframe>
+      </div>
 
-    <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
+      <div id="browser-area">
+        <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
+      </div>
+    </div>
   `;
 
   const win = createWindow("Narnia Browser", "https://logodix.com/logo/53558.png", content);
@@ -302,7 +345,7 @@ function openNarnia() {
   const goBtn = win.querySelector("#narnia-go");
   const frame = win.querySelector("#browser-frame");
   const aiBtn = win.querySelector("#narnia-ai");
-  const sidebar = win.querySelector("#grok-sidebar");
+  const aiPanel = win.querySelector("#ai-panel");
 
   let aiOpen = false;
 
@@ -318,7 +361,7 @@ function openNarnia() {
 
   aiBtn.onclick = () => {
     aiOpen = !aiOpen;
-    sidebar.classList.toggle("hidden");
+    aiPanel.classList.toggle("hidden");
     win.classList.toggle("expanded");
   };
 }
